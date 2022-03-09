@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: basic-sanity-check
+  name: basic-sanity-check-jsz
 spec:
   stepTemplate:
     volumeMounts:
@@ -12,22 +12,37 @@ spec:
     - name: sourceImage
       description: the fully qualified image name
       default: quay.io/cvpops/test-index:v4.10
-  resources:
-    inputs:
-      - name: source
-        type: git
   steps:
+    - name: clone-git-repo
+      image: quay.io/jsztuka/getgit:v1
+      script: "git clone https://github.com/dirgim/hacbs-conftest.git /project"
+      volumeMounts:
+        - name: project
+          mountPath: /project
     - name: inspect-image
       image: quay.io/skopeo/stable:latest
       script: "skopeo inspect docker://$(inputs.params.sourceImage) > /project/image_inspect.json"
       volumeMounts:
         - name: project
           mountPath: /project
-    - name: basic-sanity-checks
+    - name: basic-sanity-checks-required-labels
       image: openpolicyagent/conftest
       args:
         - "test"
         - "image_inspect.json"
+        - "--policy"
+        - "/project/image/policy/required-labels.rego"
+        - "--output=json"
+      volumeMounts:
+        - name: project
+          mountPath: /project
+    - name: basic-sanity-checks-deprecated-labels
+      image: openpolicyagent/conftest
+      args:
+        - "test"
+        - "image_inspect.json"
+        - "--policy"
+        - "/project/image/policy/deprecated-labels.rego"
         - "--output=json"
       volumeMounts:
         - name: project
