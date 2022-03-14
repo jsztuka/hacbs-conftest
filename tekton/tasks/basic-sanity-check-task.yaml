@@ -14,7 +14,7 @@ spec:
       default: quay.io/cvpops/test-index:v4.10
   steps:
     - name: clone-git-repo
-      image: quay.io/jsztuka/getgit:v1
+      image: alpine/git
       script: "git clone https://github.com/dirgim/hacbs-conftest.git /project"
       volumeMounts:
         - name: project
