@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: basic-sanity-check
+spec:
+  tasks:
+    - name: run-sanity-checks
+      taskRef:
+        name: basic-sanity-check
