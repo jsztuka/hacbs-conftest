@@ -2,12 +2,12 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: basic-sanity-check-jsz
+  name: basic-sanity-check
 spec:
-  stepTemplate:
-    volumeMounts:
-      - name: project
-        mountPath: /workspace/source/image
+#  stepTemplate:
+#    volumeMounts:
+#      - name: project
+#        mountPath: /workspace/source/image
   params:
     - name: sourceImage
       description: the fully qualified image name
