@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: sanity-checks
+spec:
+  workspaces:
+    - name: sanity-ws
+  tasks:
+    - name: skopeo-magic
+      params:
+        - name: sourceImage
+          value: quay.io/cvpops/test-index:v4.10
+      taskRef:
+        name: skopeo-inspect-image
+      workspaces:
+        - name: skopeo-ws
+          workspace: sanity-ws
+    - name: conftest-magic
+      taskRef:
+        name: conftest-sanity
+      runAfter:
+        - skopeo-magic
+      workspaces:
+        - name: conftest-ws
+          workspace: sanity-ws
