@@ -10,25 +10,25 @@ spec:
       default: quay.io/cvpops/test-index:v4.10
   steps:
     - name: inspect-image
-      image: quay.io/kpavic/hacbs-test:latest
+      image: quay.io/redhat-appstudio/hacbs-test:stable
       script: "skopeo inspect docker://$(inputs.params.sourceImage) > /tekton/home/image_inspect.json"
     - name: basic-sanity-checks-required-labels
-      image: quay.io/kpavic/hacbs-test:latest
-      command:
-        - /usr/bin/conftest
-      args:
-        - "test"
-        - "/tekton/home/image_inspect.json"
-        - "--policy"
-        - "/project/image/policy/required-labels.rego"
-        - "--output=json"
+      image: quay.io/redhat-appstudio/hacbs-test:stable
+      script: |
+        #!/usr/bin/env bash
+        conftest test "/tekton/home/image_inspect.json" --policy "/project/image/policy/required-labels.rego" --output=json
+        if [ $? != 0 ];
+        then
+          echo "REQUIRED-LABELS FAILED!"
+          exit 0
+        fi
     - name: basic-sanity-checks-deprecated-labels
-      image: quay.io/kpavic/hacbs-test:latest
-      command:
-        - /usr/bin/conftest
-      args:
-        - "test"
-        - "/tekton/home/image_inspect.json"
-        - "--policy"
-        - "/project/image/policy/deprecated-labels.rego"
-        - "--output=json"
+      image: quay.io/redhat-appstudio/hacbs-test:stable
+      script: |
+        #/usr/bin/env bash
+        conftest test "/tekton/home/image_inspect.json" --policy "/project/image/policy/deprecated-labels.rego" --output=json
+        if [ $? != 0 ];
+        then
+          echo "DEPRECATED-LABELS FAILED!"
+          exit 0
+        fi
